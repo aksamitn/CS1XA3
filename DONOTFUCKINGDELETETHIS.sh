@@ -45,17 +45,93 @@ function perform_command(){
         TMPVAR="$(git diff origin master | wc -l)"
         if [ "${TMPVAR}" -gt 0 ]
         then
-            echo "Would you like to see the difference in contents between the two repos? (y/n)"
+            echo -e "\nWould you like to see the difference in contents between the two repos? (y/n)"
             
             read tmpinput
-            if [ "$tmpinput" = "y"] || [ "$tmpinput" = "Y" ]
+            if [ "$tmpinput" = "y" ] || [ "$tmpinput" = "Y" ]
             then
                 git diff origin master
             fi
         fi
+    elif [ "$1" -eq 2 ]
+    then
+        echo "Checking for uncommitted changes, putting results into 'changes.log'"
+        git diff > changes.log
+    elif [ "$1" -eq 3 ]
+    then
+        echo "Checking project for TODO lines"
+        
+        if [ -f "todo.log" ]
+        then
+            rm "todo.log"
+        fi
+ 
+        grep -r "#TODO" * > todo.log
+    elif [ "$1" -eq 4 ]
+    then
+        echo "Checking for any errors in haskell scripts, putting results into 'error.log'"
+        find . -name "*.hs" -exec ghc -fno-code {} \; &> error.log
+    elif [ "$1" -eq 5 ]
+    then
+        echo "Performing a git pull"
+        git pull
+    elif [ "$1" -eq 6 ]
+    then
+        echo "Your directory size is: $(du -hcs .)"
+    elif [ "$1" -eq 7 ]
+    then
+        echo "There are $(find . -type f | wc -l) files in this project"
+        echo "There are $(find . -type d | wc -l) directories in this project"
+    elif [ "$1" -eq 8 ]
+    then
+        tmpinput=""
+        until [ "$tmpinput" = ":quit" ]
+        do
+            clear
+            echo "What kind of search would you like to perform?"
+            echo "1 for file name search"
+            echo -e "2 for file content search\n"
+
+            read tmpinput
+            
+            if [[ "$tmpinput" =~ $re ]]
+            then
+                if [ "$tmpinput" -eq "1" ]
+                then
+                    clear
+                    echo "Enter file name to search:"
+                    read tmpinput2
+                    find . * | grep "$tmpinput2"
+                    read -n 1 -s -r -p "Press any key to continue"
+                elif [ "$tmpinput" -eq "2" ]
+                then
+                    clear
+                    echo "Enter file content to search:"
+                    read tmpinput2
+                    grep -R "$tmpinput2"
+                    read -n 1 -s -r -p "Press any key to continue"
+                fi
+            fi
+        done
+        
     else
         echo "Number out of range of menu"
     fi
+}
+
+function show_help(){
+    clear
+    echo "HELP"
+
+    echo -e "\nHow do you use this program?"
+    echo "There are 5 main commands; 'next', 'prev', ':quit', ':help', and any number"
+    echo "To switch to the next menu list, type in 'next'"
+    echo "To switch to the previous menu list, type in 'prev'"
+    echo "To view the help screen, type in ':help'"
+    echo "To exit the program and any continuous inputs within this program, type in ':quit'"
+    echo "To perform a function build into this script, type in a number that corresponds to its menu position in the list"
+    echo -e "\nThat's basically it, have fun and go wild!"
+    read -n 1 -s -r -p "Press any key to continue"
 }
 
 until [ "$input" = ":quit" ]
@@ -75,7 +151,7 @@ do
 
     read input
 
-    if ! [[ "$input" =~ $re ]] && ! [ "$input" = "next" ] && ! [ "$input" = "prev" ]
+    if ! [[ "$input" =~ $re ]] && ! [ "$input" = "next" ] && ! [ "$input" = "prev" ] && ! [ "$input" = ":help" ]
     then
         help=1
     elif [ "$input" = "next" ]
@@ -91,7 +167,10 @@ do
         if [ "$menu" -lt 0 ]
         then
             let "menu+=1"
-        fi   
+        fi
+    elif [ "$input" = ":help" ]
+    then	
+        show_help
     else
         clear
         perform_command "$input" 

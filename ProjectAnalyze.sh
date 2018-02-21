@@ -1,87 +1,183 @@
 #!/bin/bash
 
-<<<<<<< HEAD
-######
-echo "Checking which files are different between remote and local repo:"
+# This is the second version of my original script
+# Original one I accidently deleted
+# Yeah, I was super pissed
+# So, don't use the rm command unless you're sure you don't need the thing
 
-git fetch
-git diff --name-only origin master
+# Let's start
 
-read -n 1 -s -r -p "Press any key to continue"
-echo -e "\n"
+menu=1
+maxmenu=2
+re='^[0-9]+$' # https://stackoverflow.com/questions/806906/how-do-i-test-if-a-variable-is-a-number-in-bash
+input=""
+help=0
 
-######
-echo "Putting uncommitted changes into 'changes.log'"
+function show_menu() {
+    inc=$((1 + (4 * ($1 - 1))))
 
-git diff > changes.log
+    if [ "$1" -eq 1 ]
+    then
+        declare -a menuarr=("Remote & Local Repo Diff Check" "Check Uncomitted Changes" "Check for TODO" "Check for Haskell Script Errors")
+        for i in "${menuarr[@]}"
+        do
+            echo "$inc $i"
+            let "inc++"
+        done
+    elif [ "$1" -eq 2 ]
+    then
+        declare -a menuarr=("Git Pull" "Directory Size" "Number of files in Project" "Search")
+        for i in "${menuarr[@]}"
+        do
+            echo "$inc $i"
+            let "inc++"
+        done
+    fi
+} # END OF show_menu
 
-read -n 1 -s -r -p "Press any key to continue"
-echo -e "\n"
+function perform_command(){
+    if [ "$1" -eq 1 ]
+    then
+        echo "These file(s) are different between the local and remote repo:"
+        git fetch
+        git diff --name-only origin master
 
-######
-echo "Checking project for any TODO lines"
+        TMPVAR="$(git diff origin master | wc -l)"
+        if [ "${TMPVAR}" -gt 0 ]
+        then
+            echo -e "\nWould you like to see the difference in contents between the two repos? (y/n)"
+            
+            read tmpinput
+            if [ "$tmpinput" = "y" ] || [ "$tmpinput" = "Y" ]
+            then
+                git diff origin master
+            fi
+        fi
+    elif [ "$1" -eq 2 ]
+    then
+        echo "Checking for uncommitted changes, putting results into 'changes.log'"
+        git diff > changes.log
+    elif [ "$1" -eq 3 ]
+    then
+        echo "Checking project for TODO lines"
+        
+        if [ -f "todo.log" ]
+        then
+            rm "todo.log"
+        fi
+ 
+        grep -r "#TODO" * > todo.log
+    elif [ "$1" -eq 4 ]
+    then
+        echo "Checking for any errors in haskell scripts, putting results into 'error.log'"
+        find . -name "*.hs" -exec ghc -fno-code {} \; &> error.log
+    elif [ "$1" -eq 5 ]
+    then
+        echo "Performing a git pull"
+        git pull
+    elif [ "$1" -eq 6 ]
+    then
+        echo "Your directory size is: $(du -hcs .)"
+    elif [ "$1" -eq 7 ]
+    then
+        echo "There are $(find . -type f | wc -l) files in this project"
+        echo "There are $(find . -type d | wc -l) directories in this project"
+    elif [ "$1" -eq 8 ]
+    then
+        tmpinput=""
+        until [ "$tmpinput" = ":quit" ]
+        do
+            clear
+            echo "What kind of search would you like to perform?"
+            echo "1 for file name search"
+            echo -e "2 for file content search\n"
 
-if [ -f "todo.log" ]
-then
-    echo "todo.log exists"
-    rm "todo.log"
-fi
+            read tmpinput
+            
+            if [[ "$tmpinput" =~ $re ]]
+            then
+                if [ "$tmpinput" -eq "1" ]
+                then
+                    clear
+                    echo "Enter file name to search:"
+                    read tmpinput2
+                    find . * | grep "$tmpinput2"
+                    read -n 1 -s -r -p "Press any key to continue"
+                elif [ "$tmpinput" -eq "2" ]
+                then
+                    clear
+                    echo "Enter file content to search:"
+                    read tmpinput2
+                    grep -R "$tmpinput2"
+                    read -n 1 -s -r -p "Press any key to continue"
+                fi
+            fi
+        done
+        
+    else
+        echo "Number out of range of menu"
+    fi
+}
 
-grep -r "#TODO" > todo.log
+function show_help(){
+    clear
+    echo "HELP"
 
-read -n 1 -s -r -p "Press any key to continue"
-echo -e "\n"
+    echo -e "\nHow do you use this program?"
+    echo "There are 5 main commands; 'next', 'prev', ':quit', ':help', and any number"
+    echo "To switch to the next menu list, type in 'next'"
+    echo "To switch to the previous menu list, type in 'prev'"
+    echo "To view the help screen, type in ':help'"
+    echo "To exit the program and any continuous inputs within this program, type in ':quit'"
+    echo "To perform a function build into this script, type in a number that corresponds to its menu position in the list"
+    echo -e "\nThat's basically it, have fun and go wild!"
+    read -n 1 -s -r -p "Press any key to continue"
+}
 
-######
-echo "Checking for any errors in haskell scripts"
+until [ "$input" = ":quit" ]
+do
+    clear
+    echo "Project Analysis Script"
+    echo -e "What would you like to do?\n"
 
-find . -name "*.hs" -exec ghc -fno-code {} \; &> error.log
+    if [ "$help" -eq 1 ]
+    then
+        echo -e "Type in :help for help, and :quit to quit the script"
+        help=0
+    fi
 
-echo -e "Done\n"
-
-read -n 1 -s -r -p "Press any key to continue"
-echo -e "\n"
-
-######
-VAR1="$(git diff origin master | wc -l)"
-if [ "${VAR1}" -gt 0 ]
-then
-    echo "There's a difference between the local repo and the remote repo"
-    echo "Would you like to see the contents of the different files? (y/n)"
+    show_menu "$menu"
+    echo -e "\n"
 
     read input
-    if [ "$input" = "y" ] || [ "$input" = "Y" ]
+
+    if ! [[ "$input" =~ $re ]] && ! [ "$input" = "next" ] && ! [ "$input" = "prev" ] && ! [ "$input" = ":help" ]
     then
-        echo -e "\n"
-        git diff origin master
-        echo -e "End of local/remote difference\n"
+        help=1
+    elif [ "$input" = "next" ]
+    then
+        let "menu+=1"
+        if [ "$menu" -gt "$maxmenu" ]
+        then
+            let "menu-=1"
+        fi
+    elif [ "$input" = "prev" ]
+    then
+        let "menu-=1"
+        if [ "$menu" -lt 0 ]
+        then
+            let "menu+=1"
+        fi
+    elif [ "$input" = ":help" ]
+    then	
+        show_help
     else
-        echo -e "\n"
+        clear
+        perform_command "$input" 
+        read -n 1 -s -r -p "Press any key to continue"
     fi
-fi
+done
 
-######
-echo "Would you like to do a git pull? (y/n)"
-read input
+clear
 
-if [ "$input" = "y" ] || [ "$input" = "Y" ]
-then
-    git pull
-fi
-echo -e "\n"
-
-######
-echo "Your directory size is:"
-echo $(du -hcs .)
-echo -e "\n"
-
-read -n 1 -s -r -p "Press any key to continue"
-echo -e "\n"
-
-#TODO Add a check for how many files are in project
-######
-
-#TODO Make a search function to search for something
-=======
-echo "~ Bread"
->>>>>>> 4b21bb06aa17f9515af1c69110ce323190fba93a
+# End of script

@@ -1,8 +1,21 @@
 Assign1/README.md:    3. Every line in project with '#TODO' tag is put into 'todo.log'
-changes.log:+grep -r "#TODO" > todo.log
-changes.log:+#TODO Add a check for how many files are in project
-changes.log:+#TODO Make a search function to search for something
-coolthing.sh:        grep -r "#TODO" * > todo.log
+changes.log:+        grep -r "#TODO" * > todo.log
+changes.log:-+grep -r "#TODO" > todo.log
+changes.log:-+#TODO Add a check for how many files are in project
+changes.log:-+#TODO Make a search function to search for something
+changes.log: Assign1/README.md:    3. Every line in project with '#TODO' tag is put into 'todo.log'
+changes.log:-changes.log:+grep -r "#TODO" > todo.log
+changes.log:-changes.log:+#TODO Add a check for how many files are in project
+changes.log:-changes.log:+#TODO Make a search function to search for something
+changes.log:-coolthing.sh:        grep -r "#TODO" * > todo.log
+changes.log:+changes.log:-+grep -r "#TODO" > todo.log
+changes.log:+changes.log:-+#TODO Add a check for how many files are in project
+changes.log:+changes.log:-+#TODO Make a search function to search for something
+changes.log:+DONOTFUCKINGDELETETHIS.sh:        grep -r "#TODO" * > todo.log
+changes.log: ProjectAnalyze.sh:grep -r "#TODO" > todo.log
+changes.log: ProjectAnalyze.sh:#TODO Add a check for how many files are in project
+changes.log: ProjectAnalyze.sh:#TODO Make a search function to search for something
+DONOTFUCKINGDELETETHIS.sh:        grep -r "#TODO" * > todo.log
 ProjectAnalyze.sh:grep -r "#TODO" > todo.log
 ProjectAnalyze.sh:#TODO Add a check for how many files are in project
 ProjectAnalyze.sh:#TODO Make a search function to search for something
