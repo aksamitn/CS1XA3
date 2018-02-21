@@ -1,5 +1,6 @@
 #!/bin/bash
 
+<<<<<<< HEAD
 ######
 echo "Checking which files are different between remote and local repo:"
 
@@ -81,3 +82,6 @@ echo -e "\n"
 ######
 
 #TODO Make a search function to search for something
+=======
+echo "~ Bread"
+>>>>>>> 4b21bb06aa17f9515af1c69110ce323190fba93a
