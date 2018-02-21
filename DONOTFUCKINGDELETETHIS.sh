@@ -13,6 +13,8 @@ re='^[0-9]+$' # https://stackoverflow.com/questions/806906/how-do-i-test-if-a-va
 input=""
 help=0
 
+#WOAH THIS IS A NEW LINE TO CAUSE A MERGE FAILURE THING
+
 function show_menu() {
     inc=$((1 + (4 * ($1 - 1))))
 
