@@ -21,3 +21,13 @@ Features:
     
     9. The whole program has a small text interface and a menu. User can input
        certain commands, and perform the features listed above.
+
+
+References:
+
+These code pieces were taken straight from the internet and were not made by me:
+
+re='^[0-9]+$'
+[[ ANYVAR =~ $re ]]
+
+Taken from https://stackoverflow.com/questions/806906/how-do-i-test-if-a-variable-is-a-number-in-bash 
